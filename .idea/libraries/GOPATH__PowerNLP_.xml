@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="GOPATH &lt;PowerNLP&gt;">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/.." />
+      <root url="file://$PROJECT_DIR$/../../beego-learn" />
+    </CLASSES>
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/.." />
+      <root url="file://$PROJECT_DIR$/../../beego-learn" />
+    </SOURCES>
+    <excluded>
+      <root url="file://$PROJECT_DIR$" />
+      <root url="file://$PROJECT_DIR$/BaseTrie" />
+    </excluded>
+  </library>
+</component>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/BaseTrie/BaseTrie.iml" filepath="$PROJECT_DIR$/BaseTrie/BaseTrie.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PowerNLP.iml" filepath="$PROJECT_DIR$/PowerNLP.iml" />
+    </modules>
+  </component>
+</project>
