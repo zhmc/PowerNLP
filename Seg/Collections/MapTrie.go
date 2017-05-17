@@ -1,6 +1,8 @@
-package PowerNLP
+package Collections
 
-import "fmt"
+import (
+	"fmt"
+)
 
 //树节点 用Hash表存储<Character, Node>
 type TrieNode struct {
@@ -19,18 +21,24 @@ func newTrieNode() *TrieNode {
 	return node
 }
 
-type BaseTrie struct {
+//map实现的trie树，查询速度快，占用空间有浪费
+type MapTrie struct {
 	Root *TrieNode
 }
 
-func NewBaseTrie() *BaseTrie {
-	newtrie := &BaseTrie{}
+func NewMapTrie() *MapTrie {
+	newtrie := &MapTrie{}
 	newtrie.Root = newTrieNode()
 	return newtrie
 }
 
+//加载词典
+func (this *MapTrie) LoadDict(dictpath string) {
+
+}
+
 //插入一个单词
-func (this *BaseTrie) Insert(word string) {
+func (this *MapTrie) Insert(word string) {
 	if len(word) == 0 {
 		return
 	}
@@ -55,7 +63,7 @@ func (this *BaseTrie) Insert(word string) {
 }
 
 //计算包含某个前缀的单词数量
-func (this *BaseTrie) CountPrefix(prefix string) int {
+func (this *MapTrie) CountPrefix(prefix string) int {
 	if len(prefix) == 0 {
 		return -1
 	}
@@ -83,7 +91,7 @@ func PreTraverse(node *TrieNode) {
 	}
 }
 
-func (this *BaseTrie) PreTraverseByPrefix(prefix string) {
+func (this *MapTrie) PreTraverseByPrefix(prefix string) {
 	node := this.FindPrefix(prefix)
 	if node == nil {
 		return
@@ -92,7 +100,7 @@ func (this *BaseTrie) PreTraverseByPrefix(prefix string) {
 }
 
 //是否包含某个单词
-func (this *BaseTrie) Has(word string) bool {
+func (this *MapTrie) Has(word string) bool {
 	if len(word) == 0 {
 		return false
 	}
@@ -114,7 +122,7 @@ func (this *BaseTrie) Has(word string) bool {
 }
 
 //找到某个前缀的最终节点
-func (this *BaseTrie) FindPrefix(prefix string) *TrieNode {
+func (this *MapTrie) FindPrefix(prefix string) *TrieNode {
 	if len(prefix) == 0 {
 		return nil
 	}
@@ -135,7 +143,7 @@ func (this *BaseTrie) FindPrefix(prefix string) *TrieNode {
 }
 
 //分词
-func (this *BaseTrie) Segment(setence string) []string {
+func (this *MapTrie) Segment(setence string) []string {
 	chars := []rune(setence)
 	results := make([]string, 0)
 	//tmpChar := ""
