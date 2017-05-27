@@ -7,11 +7,11 @@ import (
 
 func main() {
 	t := Collections.NewDATrie()
-	fmt.Println(t.EndRune)
-	fmt.Println(string(t.EndRune))
+	fmt.Println(Collections.EndRune)
+	fmt.Println(string(Collections.EndRune))
 	fmt.Println(len(t.Base))
 	fmt.Println(len(t.RuneCodeMap))
 	fmt.Println(t.GetRuneCode('d'))
-	fmt.Println(t.Tail[0])
-
+	t.AppendToTailArray([]rune("hello"),3)
+	fmt.Println(string(t.Tail[0]))
 }

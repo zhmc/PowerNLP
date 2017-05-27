@@ -2,27 +2,28 @@ package Collections
 
 //双数组Trie树
 type DATrie struct {
-	Base        []int    //base数组
-	Check       []int    //check数组
-	Tail        [][]rune // 存放尾串的数组
-	tailPosition int  // 现在尾串的位置
-	EndRune     rune  //标记结束的字符
-	RuneCodeMap map[rune]int //<字符，code码>hash表
+	Base         []int        //base数组
+	Check        []int        //check数组
+	Tail         [][]rune     // 存放尾串的数组
+	tailPosition int          // 现在尾串的位置
+	RuneCodeMap  map[rune]int //<字符，code码>hash表
 
 }
+
+//标记结束的字符
+const EndRune = '#'
 
 //初始化双数组Tire
 func NewDATrie() *DATrie {
 	newDATrie := DATrie{}
-	newDATrie.EndRune = '#'
 	newDATrie.Base = make([]int, 1024)
 	//Base数组0位置不用，1是根节点
 	newDATrie.Base[1] = 1
 	newDATrie.Check = make([]int, 1024)
-	newDATrie.Tail = make([][]rune, 10)
-	newDATrie.tailPosition=0
+	newDATrie.Tail = make([][]rune, 0)
+	newDATrie.tailPosition = 0
 	newDATrie.RuneCodeMap = make(map[rune]int)
-	newDATrie.RuneCodeMap[newDATrie.EndRune] = 1
+	newDATrie.RuneCodeMap[EndRune] = 1
 	for i := 0; i < 26; i++ {
 		//+1是因为code从1开始
 		newDATrie.RuneCodeMap[rune('a'+i)] = len(newDATrie.RuneCodeMap) + 1
@@ -92,10 +93,16 @@ func (this *DATrie) getChildList(fatherIndex int) []int {
 	return childList
 }
 
+//将一个字符串的尾串添加到TAIL数组中
+func (this *DATrie) AppendToTailArray(runes []rune, positon int) {
+	tailRunes := runes[positon:]
+	this.Tail = append(this.Tail, tailRunes)
+}
+
 //添加单词 最核心部分
 func (this *DATrie) insert(word string) {
 	wordRunes := []rune(word)
-	wordRunes = append(wordRunes, this.EndRune)
+	wordRunes = append(wordRunes, EndRune)
 
 	prePosition := 1        //之前位置
 	var currentPosition int //现在位置
@@ -110,8 +117,31 @@ func (this *DATrie) insert(word string) {
 			this.extendBaseCheck(currentPosition - len(this.Base) + 1)
 		}
 		//该子节点未被占用
-		if this.Base[currentPosition] == 0 && this.Check[currentPosition] == 0{
+		if this.Base[currentPosition] == 0 && this.Check[currentPosition] == 0 {
+			this.AppendToTailArray(wordRunes, index+1) //index要不要加1
+			//尾串添加到tail数组中的位置为len(this.Tail)-1
+			this.Base[currentPosition] = -(len(this.Tail) - 1)
+			this.Check[currentPosition] = prePosition
+			return //结束了
+		} else { //该节点已经被占用
+			//如果可以正常转移 未发生冲突
+			if this.Base[currentPosition] > 0 && this.Check[currentPosition] == prePosition {
+				prePosition = currentPosition
+				continue
+			} else { //发生冲突
 
+				//冲突 1：遇到 Base[cur_p]小于0的，即遇到一个被压缩存到Tail中的字符串
+				if this.Base[currentPosition] < 0 && this.Check[currentPosition] == prePosition {
+					tailIndex := -this.Base[currentPosition]
+					//发生冲突的单词（树的路径）的尾串完全一样，就停止了
+					if string(this.Tail[tailIndex]) == string(wordRunes[index+1]) {
+						return
+					}else { //尾串不一样
+
+					}
+				}
+
+			}
 		}
 	}
 }
