@@ -40,11 +40,11 @@ func (this *DATrie) extendBaseCheck(addsize int) {
 }
 
 //获得字符的code码
-func (this *DATrie) GetRuneCode(r rune) int {
-	if _, ok := this.RuneCodeMap[r]; !ok {
-		this.RuneCodeMap[r] = len(this.RuneCodeMap) + 1
+func (this *DATrie) GetRuneCode(_rune rune) int {
+	if _, ok := this.RuneCodeMap[_rune]; !ok {
+		this.RuneCodeMap[_rune] = len(this.RuneCodeMap) + 1
 	}
-	return this.RuneCodeMap[r]
+	return this.RuneCodeMap[_rune]
 }
 
 //寻找到新的base值，能够满足按照转移得到的子节点的位置都没有被占用
@@ -105,7 +105,7 @@ func (this *DATrie) insert(word string) {
 	wordRunes = append(wordRunes, EndRune)
 
 	prePosition := 1        //之前位置
-	var currentPosition int //现在位置
+	var currentPosition int //现在位置-走一个单词的路径过程中当前字符在base数组中的索引位置
 
 	//index用于取尾串
 	for index, char := range wordRunes {
@@ -136,7 +136,23 @@ func (this *DATrie) insert(word string) {
 					//发生冲突的单词（树的路径）的尾串完全一样，就停止了
 					if string(this.Tail[tailIndex]) == string(wordRunes[index+1]) {
 						return
-					}else { //尾串不一样
+					} else { //尾串不一样。取出共同前缀，存入Base数组，独立区分尾串存入Tail
+						if this.Tail[tailIndex][0] == wordRunes[index+1] {
+							moveDistance := this.GetRuneCode(wordRunes[index+1])
+							newBaseValue := this.x_check([]int{moveDistance})
+							//换上新的base值，从负值到正值（有子节点）
+							this.Base[currentPosition] = newBaseValue
+
+							//改变tail数组中存放的。去掉第一个
+							this.Tail[tailIndex] = this.Tail[tailIndex][1:]
+							//这条边到达的子节点在Base数组中位置是newBaseValue+moveDistance
+							this.Base[newBaseValue+moveDistance] = -tailIndex
+							this.Check[newBaseValue+moveDistance] = currentPosition
+							prePosition = currentPosition
+							continue
+
+						}
+						//TODO
 
 					}
 				}
@@ -144,4 +160,31 @@ func (this *DATrie) insert(word string) {
 			}
 		}
 	}
+}
+
+//确认是否存在某个单词
+func (this *DATrie) exist(word string) bool {
+	exist := false
+	chars := []rune(word)
+	chars = append(chars, EndRune)
+	prePosition := 1
+	currentPositon := 0
+	for _, char := range chars {
+		currentPositon = prePosition + this.GetRuneCode(char)
+		//等于0，根本没有
+		if this.Base[currentPositon] == 0 {
+			return false
+		} else if this.Base[currentPositon] > 0 {
+			if this.Check[currentPositon] != prePosition {
+				return false
+			}
+			prePosition = currentPositon
+		} else {
+			//TODO
+
+
+		}
+
+	}
+	return exist
 }

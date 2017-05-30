@@ -10,6 +10,7 @@ func main() {
 	fmt.Printf("result:%v\n", d)
 
 	a := []rune{'a','c','m','龢'}
+	fmt.Println((a[1:]))
 	b := [10]rune{}
 	a = append(a,b[:]...)
 	fmt.Println(len(a))

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/zhmc/PowerNLP/Seg"
+	//"github.com/zhmc/PowerNLP/Seg"
 )
 
 func main() {
@@ -10,5 +10,10 @@ func main() {
 	fmt.Println(length)
 	fmt.Println(len("你好,hello"))
 
-	Seg.DeafaultSegment()
+	//Seg.DeafaultSegment()
+	runes := []rune("我是传奇mike82MIKE")
+	for _,v := range runes{
+		fmt.Println(int(v))
+	}
+
 }
