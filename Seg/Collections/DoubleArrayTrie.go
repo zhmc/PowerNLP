@@ -100,7 +100,7 @@ func (this *DATrie) AppendToTailArray(runes []rune, positon int) {
 }
 
 //添加单词 最核心部分
-func (this *DATrie) insert(word string) {
+func (this *DATrie) Insert(word string) {
 	wordRunes := []rune(word)
 	wordRunes = append(wordRunes, EndRune)
 
@@ -163,25 +163,28 @@ func (this *DATrie) insert(word string) {
 }
 
 //确认是否存在某个单词
-func (this *DATrie) exist(word string) bool {
+func (this *DATrie) Contain(word string) bool {
 	exist := false
 	chars := []rune(word)
 	chars = append(chars, EndRune)
 	prePosition := 1
 	currentPositon := 0
-	for _, char := range chars {
+	for index, char := range chars {
 		currentPositon = prePosition + this.GetRuneCode(char)
 		//等于0，根本没有
 		if this.Base[currentPositon] == 0 {
 			return false
 		} else if this.Base[currentPositon] > 0 {
+			//大于0，继续转移
 			if this.Check[currentPositon] != prePosition {
 				return false
 			}
 			prePosition = currentPositon
 		} else {
-			//TODO
-
+			//小于0，去比较尾串
+			if string(this.Tail[-this.Base[currentPositon]]) == string(chars[index+1:]) {
+				return true
+			}
 
 		}
 
