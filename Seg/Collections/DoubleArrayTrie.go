@@ -1,5 +1,7 @@
 package Collections
 
+import "fmt"
+
 //双数组Trie树
 type DATrie struct {
 	Base         []int        //base数组
@@ -55,9 +57,9 @@ func (this *DATrie) x_check(checklist []int) int {
 		stopflag := true
 
 		//遍历所有子节点的转移字符（到达子节点的code）
-		for _, inputChar := range checklist {
+		for _, inputCode := range checklist {
 			//新的子节点位置
-			newSonNodeIndex := i + inputChar
+			newSonNodeIndex := i + inputCode
 			//如果这个位置已经被占据，退出
 			if this.Base[newSonNodeIndex] != 0 || this.Check[newSonNodeIndex] != 0 {
 				stopflag = false
@@ -93,10 +95,11 @@ func (this *DATrie) getChildList(fatherIndex int) []int {
 	return childList
 }
 
-//将一个字符串的尾串添加到TAIL数组中
-func (this *DATrie) AppendToTailArray(runes []rune, positon int) {
+//将一个字符串的尾串添加到TAIL数组中, 返回位置
+func (this *DATrie) AppendToTailArray(runes []rune, positon int) int{
 	tailRunes := runes[positon:]
 	this.Tail = append(this.Tail, tailRunes)
+	return len(this.Tail) -1
 }
 
 //添加单词 最核心部分
@@ -137,22 +140,43 @@ func (this *DATrie) Insert(word string) {
 					if string(this.Tail[tailIndex]) == string(wordRunes[index+1]) {
 						return
 					} else { //尾串不一样。取出共同前缀，存入Base数组，独立区分尾串存入Tail
+						//相同的字符
 						if this.Tail[tailIndex][0] == wordRunes[index+1] {
-							moveDistance := this.GetRuneCode(wordRunes[index+1])
-							newBaseValue := this.x_check([]int{moveDistance})
-							//换上新的base值，从负值到正值（有子节点）
+							tailHeadCode := this.GetRuneCode(wordRunes[index+1])
+							newBaseValue := this.x_check([]int{tailHeadCode})
+							//换上新的base值，从负值到正值（有一个子节点）
 							this.Base[currentPosition] = newBaseValue
 
 							//改变tail数组中存放的。去掉第一个
 							this.Tail[tailIndex] = this.Tail[tailIndex][1:]
-							//这条边到达的子节点在Base数组中位置是newBaseValue+moveDistance
-							this.Base[newBaseValue+moveDistance] = -tailIndex
-							this.Check[newBaseValue+moveDistance] = currentPosition
+							//这条边到达的子节点在Base数组中位置是newBaseValue+tailHeadCode
+							this.Base[newBaseValue+tailHeadCode] = -tailIndex
+							this.Check[newBaseValue+tailHeadCode] = currentPosition
 							prePosition = currentPosition
 							continue
 
+						} else {//不同的字符
+							//TODO
+							tailHeadCode := this.GetRuneCode(this.Tail[tailIndex][0])
+							nextCharCode := this.GetRuneCode(wordRunes[index+1])
+							newBaseValue := this.x_check([]int{tailHeadCode, nextCharCode})
+							fmt.Println("new base:", newBaseValue)
+							//换上新的base值，从负值到正值（有两个子节点）
+							this.Base[currentPosition] = newBaseValue
+							//改变tail数组中存放的。去掉第一个
+							this.Tail[tailIndex] = this.Tail[tailIndex][1:]
+							//这条边到达的子节点在Base数组中位置是newBaseValue+tailHeadCode
+							this.Base[newBaseValue+tailHeadCode] = -tailIndex
+							this.Check[newBaseValue+tailHeadCode] = currentPosition
+
+							//word转化的rune数组中剩余的部分存入tail
+							newTailIndex := this.AppendToTailArray(wordRunes, index+1)
+							this.Base[newBaseValue+nextCharCode] = -newTailIndex
+							this.Check[newBaseValue+nextCharCode] = currentPosition
+
+							return
+
 						}
-						//TODO
 
 					}
 				}

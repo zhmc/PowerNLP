@@ -18,6 +18,11 @@ func main() {
 	fmt.Println(t.Contain("ab"))
 	fmt.Println(t.Contain("abc"))
 	t.Insert("黑娃")
-	fmt.Println(t.Contain("黑"))
-	fmt.Println(t.Contain("黑娃"))
+	fmt.Println("存在 黑吗",t.Contain("黑"))
+	fmt.Println("存在 黑娃吗",t.Contain("黑娃"))
+	fmt.Println(t.Contain("黑娃娃"))
+	t.Insert("黑大陆")
+	fmt.Println("存在 黑娃吗",t.Contain("黑娃"))
+	fmt.Println("存在 黑大陆吗",t.Contain("黑大陆"))
+
 }
