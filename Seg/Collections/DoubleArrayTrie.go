@@ -54,7 +54,7 @@ func (this *DATrie) x_check(checklist []int) int {
 
 	//从1开始寻找新的base值
 	for i := 1; ; i++ {
-		stopflag := true
+		stopFlag := true
 
 		//遍历所有子节点的转移字符（到达子节点的code）
 		for _, inputCode := range checklist {
@@ -62,7 +62,7 @@ func (this *DATrie) x_check(checklist []int) int {
 			newSonNodeIndex := i + inputCode
 			//如果这个位置已经被占据，退出
 			if this.Base[newSonNodeIndex] != 0 || this.Check[newSonNodeIndex] != 0 {
-				stopflag = false
+				stopFlag = false
 				break
 			}
 			//新的子节点位置已经超过原数组大小了
@@ -72,23 +72,23 @@ func (this *DATrie) x_check(checklist []int) int {
 		}
 
 		//遍历所有子节点的转移字符结束，发现可以满足要求
-		if stopflag {
+		if stopFlag {
 			return i
 		}
-		return 0
+		//return 0
 	}
 }
 
-//找出某个节点的所有子节点
-func (this *DATrie) getChildList(fatherIndex int) []int {
+//找出某个节点的所有子节点的字符编码（达到子节点的边所代表的字符编码）
+func (this *DATrie) getChildList(fatherNodeBaseIndex int) []int {
 	childList := make([]int, 0)
 	//遍历所有转移字符，看看这个节点是否有这一条边
 	for i := 1; i < len(this.RuneCodeMap); i++ {
-		maybeSonIndex := this.Base[fatherIndex] + i
+		maybeSonIndex := this.Base[fatherNodeBaseIndex] + i
 		if maybeSonIndex > len(this.Base) {
 			break
 		}
-		if this.Check[maybeSonIndex] == fatherIndex {
+		if this.Check[maybeSonIndex] == fatherNodeBaseIndex {
 			childList = append(childList, i)
 		}
 	}
@@ -120,9 +120,10 @@ func (this *DATrie) Insert(word string) {
 			this.extendBaseCheck(currentPosition - len(this.Base) + 1)
 		}
 		//该子节点未被占用
+		//若单纯只是this.Base[currentPosition] == 0 并不代表未占用，有结束符连接到这个节点的情况
 		if this.Base[currentPosition] == 0 && this.Check[currentPosition] == 0 {
 			//先插入ba#, bc#，又插入b#（新的单词是旧的子串
-			if char == EndRune{
+			if char == EndRune {
 				this.Base[currentPosition] = 0
 				this.Check[currentPosition] = prePosition
 				return //结束了
@@ -150,11 +151,14 @@ func (this *DATrie) Insert(word string) {
 			if string(this.Tail[tailIndex]) == string(wordRunes[index+1]) {
 				return
 			}
-			//尾串不一样。取出共同前缀，存入Base数组，独立区分尾串存入Tail
-			//相同的字符
+			//尾串不完全一样。取出共同前缀，存入Base数组，独立区分尾串存入Tail
+
+			//前面可能存在的相同的字符
 			if this.Tail[tailIndex][0] == wordRunes[index+1] {
+				fmt.Println("相同的前缀")
 				tailHeadCode := this.GetRuneCode(wordRunes[index+1])
 				newBaseValue := this.x_check([]int{tailHeadCode})
+
 				//换上新的base值，从负值到正值（有一个子节点）
 				this.Base[currentPosition] = newBaseValue
 
@@ -167,12 +171,17 @@ func (this *DATrie) Insert(word string) {
 				continue
 
 			} else { //不同的字符 可能有一个为结束符
-				fmt.Println("string(this.Tail[tailIndex][0])",string(this.Tail[tailIndex][0]))
+				fmt.Println("开始不同的字符")
+				fmt.Println("string(this.Tail[tailIndex][0])", string(this.Tail[tailIndex][0]))
+				fmt.Println("string(wordRunes[index+1]) ",string(wordRunes[index+1]))
 				tailHeadCode := this.GetRuneCode(this.Tail[tailIndex][0])
 				nextCharCode := this.GetRuneCode(wordRunes[index+1])
 				newBaseValue := this.x_check([]int{tailHeadCode, nextCharCode})
 				//换上新的base值，从负值到正值（有两个子节点）
 				this.Base[currentPosition] = newBaseValue
+				fmt.Println("newBaseValue ",newBaseValue)
+				fmt.Println("newBaseValue+tailHeadCode ",newBaseValue+tailHeadCode)
+				fmt.Println("newBaseValue+nextCharCode ",newBaseValue+nextCharCode)
 				this.Check[newBaseValue+tailHeadCode] = currentPosition
 				this.Check[newBaseValue+nextCharCode] = currentPosition
 
@@ -207,7 +216,29 @@ func (this *DATrie) Insert(word string) {
 		//冲突2：当前结点已经被占用，需要调整pre的base
 		//这里也就是整个DATrie最复杂的地方了
 		if this.Check[currentPosition] != prePosition {
+			fmt.Println("冲突2")
+			fmt.Println("string(char) ",string(char))
+			fmt.Println("currentPosition ",currentPosition)
+			fmt.Println("prePosition ",prePosition)
+			fmt.Println("this.Base[prePosition] ",this.Base[prePosition])
+			fmt.Println("this.Check[currentPosition] ",this.Check[currentPosition])
 
+			preNodeSons := this.getChildList(prePosition) //之前节点的所有子节点
+			//发生冲突的节点的所有子节点
+			anotherNodeSons := this.getChildList(this.Check[currentPosition])
+			newBaseValue := 0
+
+
+			//选择迁移成本较小的节点
+			if len(preNodeSons)+1 > len(anotherNodeSons) {
+				newBaseValue = this.x_check(anotherNodeSons)
+			} else {
+				newBaseValue = this.x_check(append(preNodeSons, this.GetRuneCode(char)))
+			}
+
+			fmt.Println(newBaseValue)
+
+			//return
 		}
 
 	}
@@ -225,28 +256,36 @@ func (this *DATrie) Contains(word string) bool {
 		//等于0，根本没有或者是结束符转移到了这里
 		if this.Base[currentPosition] == 0 {
 			fmt.Println("this.Base[currentPosition] == 0")
-			if this.Check[currentPosition] == prePosition && index==len(chars)-1{
+			fmt.Println("currentPosition ",  currentPosition)
+			fmt.Println("prePosition ",  prePosition)
+			fmt.Println("this.Check[currentPosition] ", this.Check[currentPosition])
+			fmt.Println("this.Check[currentPosition] == prePosition ", this.Check[currentPosition] == prePosition)
+			if this.Check[currentPosition] == prePosition && index == len(chars)-1 {
 				fmt.Println("this.Check[currentPosition] == prePosition && index==len(chars)-1")
 				return true
 			}
 			return false
 		} else if this.Base[currentPosition] > 0 {
+			fmt.Println("this.Base[currentPosition] > 0")
 			//大于0，继续转移
 			if this.Check[currentPosition] != prePosition {
 				return false
 			}
 			prePosition = currentPosition
 		} else {
+			fmt.Println("this.Base[currentPosition] < 0")
 			//小于0，去比较尾串
 
 			fmt.Println("this.Base[currentPosition]", this.Base[currentPosition])
-			fmt.Println("string(char) ",string(char))
-			fmt.Println("string(this.Tail[-this.Base[currentPosition]])",string(this.Tail[-this.Base[currentPosition]]))
-			fmt.Println("string(chars[index+1:])",string(chars[index+1:]))
+			fmt.Println("string(char) ", string(char))
+			fmt.Println("string(this.Tail[-this.Base[currentPosition]])", string(this.Tail[-this.Base[currentPosition]]))
+			fmt.Println("string(chars[index+1:])", string(chars[index+1:]))
 
 			if string(this.Tail[-this.Base[currentPosition]]) == string(chars[index+1:]) {
 				return true
-			} else {return false}
+			} else {
+				return false
+			}
 
 		}
 
