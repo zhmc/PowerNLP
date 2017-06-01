@@ -69,4 +69,9 @@ func main() {
 	t.Insert("badge")
 	fmt.Println("插入 baby")
 	t.Insert("baby")
+	fmt.Println("存在 bachelor?", t.Contains("bachelor"))
+	fmt.Println("存在 jar?", t.Contains("jar"))
+	fmt.Println("存在 badge?", t.Contains("badge"))
+	fmt.Println("存在 baby?", t.Contains("baby"))
+
 }
