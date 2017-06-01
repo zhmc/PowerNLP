@@ -1,7 +1,5 @@
 package Collections
 
-import "fmt"
-
 //双数组Trie树
 type DATrie struct {
 	Base         []int        //base数组
@@ -22,7 +20,7 @@ func NewDATrie() *DATrie {
 	//Base数组0位置不用，1是根节点
 	newDATrie.Base[1] = 1
 	newDATrie.Check = make([]int, 1024)
-	newDATrie.Tail = make([][]rune, 0)
+	newDATrie.Tail = make([][]rune, 1) //tail数组第一个必须空，因为base中存负值，索引为0的用不上
 	newDATrie.tailPosition = 0
 	newDATrie.RuneCodeMap = make(map[rune]int)
 	newDATrie.RuneCodeMap[EndRune] = 1
@@ -35,8 +33,8 @@ func NewDATrie() *DATrie {
 }
 
 //将双数组扩充一定长度
-func (this *DATrie) extendBaseCheck(addsize int) {
-	new := make([]int, addsize)
+func (this *DATrie) extendBaseCheck(addSize int) {
+	new := make([]int, addSize)
 	this.Base = append(this.Base, new[:]...)
 	this.Check = append(this.Check, new[:]...)
 }
@@ -96,10 +94,10 @@ func (this *DATrie) getChildList(fatherIndex int) []int {
 }
 
 //将一个字符串的尾串添加到TAIL数组中, 返回位置
-func (this *DATrie) AppendToTailArray(runes []rune, positon int) int{
-	tailRunes := runes[positon:]
+func (this *DATrie) AppendToTailArray(runes []rune, position int) int {
+	tailRunes := runes[position:]
 	this.Tail = append(this.Tail, tailRunes)
-	return len(this.Tail) -1
+	return len(this.Tail) - 1
 }
 
 //添加单词 最核心部分
@@ -155,12 +153,11 @@ func (this *DATrie) Insert(word string) {
 							prePosition = currentPosition
 							continue
 
-						} else {//不同的字符
+						} else { //不同的字符
 							//TODO
 							tailHeadCode := this.GetRuneCode(this.Tail[tailIndex][0])
 							nextCharCode := this.GetRuneCode(wordRunes[index+1])
 							newBaseValue := this.x_check([]int{tailHeadCode, nextCharCode})
-							fmt.Println("new base:", newBaseValue)
 							//换上新的base值，从负值到正值（有两个子节点）
 							this.Base[currentPosition] = newBaseValue
 							//改变tail数组中存放的。去掉第一个
@@ -170,7 +167,8 @@ func (this *DATrie) Insert(word string) {
 							this.Check[newBaseValue+tailHeadCode] = currentPosition
 
 							//word转化的rune数组中剩余的部分存入tail
-							newTailIndex := this.AppendToTailArray(wordRunes, index+1)
+							//为什么要用index+2？因为index+1已经作为到达子节点的边存在双数组中了
+							newTailIndex := this.AppendToTailArray(wordRunes, index+2)
 							this.Base[newBaseValue+nextCharCode] = -newTailIndex
 							this.Check[newBaseValue+nextCharCode] = currentPosition
 
@@ -192,21 +190,21 @@ func (this *DATrie) Contain(word string) bool {
 	chars := []rune(word)
 	chars = append(chars, EndRune)
 	prePosition := 1
-	currentPositon := 0
+	currentPosition := 0
 	for index, char := range chars {
-		currentPositon = prePosition + this.GetRuneCode(char)
+		currentPosition = this.Base[prePosition] + this.GetRuneCode(char)
 		//等于0，根本没有
-		if this.Base[currentPositon] == 0 {
+		if this.Base[currentPosition] == 0 {
 			return false
-		} else if this.Base[currentPositon] > 0 {
+		} else if this.Base[currentPosition] > 0 {
 			//大于0，继续转移
-			if this.Check[currentPositon] != prePosition {
+			if this.Check[currentPosition] != prePosition {
 				return false
 			}
-			prePosition = currentPositon
+			prePosition = currentPosition
 		} else {
 			//小于0，去比较尾串
-			if string(this.Tail[-this.Base[currentPositon]]) == string(chars[index+1:]) {
+			if string(this.Tail[-this.Base[currentPosition]]) == string(chars[index+1:]) {
 				return true
 			}
 
