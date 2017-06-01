@@ -1,5 +1,7 @@
 package Collections
 
+import "fmt"
+
 //双数组Trie树
 type DATrie struct {
 	Base         []int        //base数组
@@ -119,73 +121,100 @@ func (this *DATrie) Insert(word string) {
 		}
 		//该子节点未被占用
 		if this.Base[currentPosition] == 0 && this.Check[currentPosition] == 0 {
+			//先插入ba#, bc#，又插入b#（新的单词是旧的子串
+			if char == EndRune{
+				this.Base[currentPosition] = 0
+				this.Check[currentPosition] = prePosition
+				return //结束了
+			}
+
 			this.AppendToTailArray(wordRunes, index+1) //index要不要加1
 			//尾串添加到tail数组中的位置为len(this.Tail)-1
 			this.Base[currentPosition] = -(len(this.Tail) - 1)
 			this.Check[currentPosition] = prePosition
 			return //结束了
-		} else { //该节点已经被占用
-			//如果可以正常转移 未发生冲突
-			if this.Base[currentPosition] > 0 && this.Check[currentPosition] == prePosition {
+		}
+
+		//该节点已经被占用
+		//如果可以正常转移 未发生冲突
+		if this.Base[currentPosition] > 0 && this.Check[currentPosition] == prePosition {
+			prePosition = currentPosition
+			continue
+		}
+		//发生冲突
+
+		//冲突 1：遇到 Base[cur_p]小于0的，即遇到一个被压缩存到Tail中的字符串
+		if this.Base[currentPosition] < 0 && this.Check[currentPosition] == prePosition {
+			tailIndex := -this.Base[currentPosition]
+			//发生冲突的单词（树的路径）的尾串完全一样，就停止了
+			if string(this.Tail[tailIndex]) == string(wordRunes[index+1]) {
+				return
+			}
+			//尾串不一样。取出共同前缀，存入Base数组，独立区分尾串存入Tail
+			//相同的字符
+			if this.Tail[tailIndex][0] == wordRunes[index+1] {
+				tailHeadCode := this.GetRuneCode(wordRunes[index+1])
+				newBaseValue := this.x_check([]int{tailHeadCode})
+				//换上新的base值，从负值到正值（有一个子节点）
+				this.Base[currentPosition] = newBaseValue
+
+				//改变tail数组中存放的。去掉第一个
+				this.Tail[tailIndex] = this.Tail[tailIndex][1:]
+				//这条边到达的子节点在Base数组中位置是newBaseValue+tailHeadCode
+				this.Base[newBaseValue+tailHeadCode] = -tailIndex
+				this.Check[newBaseValue+tailHeadCode] = currentPosition
 				prePosition = currentPosition
 				continue
-			} else { //发生冲突
 
-				//冲突 1：遇到 Base[cur_p]小于0的，即遇到一个被压缩存到Tail中的字符串
-				if this.Base[currentPosition] < 0 && this.Check[currentPosition] == prePosition {
-					tailIndex := -this.Base[currentPosition]
-					//发生冲突的单词（树的路径）的尾串完全一样，就停止了
-					if string(this.Tail[tailIndex]) == string(wordRunes[index+1]) {
-						return
-					} else { //尾串不一样。取出共同前缀，存入Base数组，独立区分尾串存入Tail
-						//相同的字符
-						if this.Tail[tailIndex][0] == wordRunes[index+1] {
-							tailHeadCode := this.GetRuneCode(wordRunes[index+1])
-							newBaseValue := this.x_check([]int{tailHeadCode})
-							//换上新的base值，从负值到正值（有一个子节点）
-							this.Base[currentPosition] = newBaseValue
+			} else { //不同的字符 可能有一个为结束符
+				fmt.Println("string(this.Tail[tailIndex][0])",string(this.Tail[tailIndex][0]))
+				tailHeadCode := this.GetRuneCode(this.Tail[tailIndex][0])
+				nextCharCode := this.GetRuneCode(wordRunes[index+1])
+				newBaseValue := this.x_check([]int{tailHeadCode, nextCharCode})
+				//换上新的base值，从负值到正值（有两个子节点）
+				this.Base[currentPosition] = newBaseValue
+				this.Check[newBaseValue+tailHeadCode] = currentPosition
+				this.Check[newBaseValue+nextCharCode] = currentPosition
 
-							//改变tail数组中存放的。去掉第一个
-							this.Tail[tailIndex] = this.Tail[tailIndex][1:]
-							//这条边到达的子节点在Base数组中位置是newBaseValue+tailHeadCode
-							this.Base[newBaseValue+tailHeadCode] = -tailIndex
-							this.Check[newBaseValue+tailHeadCode] = currentPosition
-							prePosition = currentPosition
-							continue
-
-						} else { //不同的字符
-							//TODO
-							tailHeadCode := this.GetRuneCode(this.Tail[tailIndex][0])
-							nextCharCode := this.GetRuneCode(wordRunes[index+1])
-							newBaseValue := this.x_check([]int{tailHeadCode, nextCharCode})
-							//换上新的base值，从负值到正值（有两个子节点）
-							this.Base[currentPosition] = newBaseValue
-							//改变tail数组中存放的。去掉第一个
-							this.Tail[tailIndex] = this.Tail[tailIndex][1:]
-							//这条边到达的子节点在Base数组中位置是newBaseValue+tailHeadCode
-							this.Base[newBaseValue+tailHeadCode] = -tailIndex
-							this.Check[newBaseValue+tailHeadCode] = currentPosition
-
-							//word转化的rune数组中剩余的部分存入tail
-							//为什么要用index+2？因为index+1已经作为到达子节点的边存在双数组中了
-							newTailIndex := this.AppendToTailArray(wordRunes, index+2)
-							this.Base[newBaseValue+nextCharCode] = -newTailIndex
-							this.Check[newBaseValue+nextCharCode] = currentPosition
-
-							return
-
-						}
-
-					}
+				//Tail 为END_FLAG 的情况
+				if this.Tail[tailIndex][0] == EndRune {
+					fmt.Println("this.Tail[tailIndex][0] == EndRune")
+					this.Base[newBaseValue+tailHeadCode] = 0
+				} else {
+					//改变tail数组中存放的。去掉第一个
+					this.Tail[tailIndex] = this.Tail[tailIndex][1:]
+					//这条边到达的子节点在Base数组中位置是newBaseValue+tailHeadCode
+					this.Base[newBaseValue+tailHeadCode] = -tailIndex
 				}
 
+				//word转化的rune数组中剩余的部分存入tail
+				//为什么要用index+2？因为index+1已经作为到达子节点的边存在双数组中了
+				if wordRunes[index+1] == EndRune {
+					fmt.Println("wordRunes[index+1] == EndRune")
+					this.Base[newBaseValue+nextCharCode] = 0
+				} else {
+					newTailIndex := this.AppendToTailArray(wordRunes, index+2)
+					this.Base[newBaseValue+nextCharCode] = -newTailIndex
+				}
+				return
+
 			}
+
 		}
+
+		//TODO
+
+		//冲突2：当前结点已经被占用，需要调整pre的base
+		//这里也就是整个DATrie最复杂的地方了
+		if this.Check[currentPosition] != prePosition {
+
+		}
+
 	}
 }
 
 //确认是否存在某个单词
-func (this *DATrie) Contain(word string) bool {
+func (this *DATrie) Contains(word string) bool {
 	exist := false
 	chars := []rune(word)
 	chars = append(chars, EndRune)
@@ -193,8 +222,13 @@ func (this *DATrie) Contain(word string) bool {
 	currentPosition := 0
 	for index, char := range chars {
 		currentPosition = this.Base[prePosition] + this.GetRuneCode(char)
-		//等于0，根本没有
+		//等于0，根本没有或者是结束符转移到了这里
 		if this.Base[currentPosition] == 0 {
+			fmt.Println("this.Base[currentPosition] == 0")
+			if this.Check[currentPosition] == prePosition && index==len(chars)-1{
+				fmt.Println("this.Check[currentPosition] == prePosition && index==len(chars)-1")
+				return true
+			}
 			return false
 		} else if this.Base[currentPosition] > 0 {
 			//大于0，继续转移
@@ -204,9 +238,15 @@ func (this *DATrie) Contain(word string) bool {
 			prePosition = currentPosition
 		} else {
 			//小于0，去比较尾串
+
+			fmt.Println("this.Base[currentPosition]", this.Base[currentPosition])
+			fmt.Println("string(char) ",string(char))
+			fmt.Println("string(this.Tail[-this.Base[currentPosition]])",string(this.Tail[-this.Base[currentPosition]]))
+			fmt.Println("string(chars[index+1:])",string(chars[index+1:]))
+
 			if string(this.Tail[-this.Base[currentPosition]]) == string(chars[index+1:]) {
 				return true
-			}
+			} else {return false}
 
 		}
 
