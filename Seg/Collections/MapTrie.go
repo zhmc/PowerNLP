@@ -42,7 +42,7 @@ func (this *MapTrie) Insert(word string) {
 	if len(word) == 0 {
 		return
 	}
-	//if this.Has(word) {
+	//if this.Has(word.py) {
 	//	return
 	//}
 	tmpNode := this.Root

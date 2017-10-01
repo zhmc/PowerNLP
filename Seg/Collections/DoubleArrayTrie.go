@@ -65,6 +65,7 @@ func (this *DATrie) x_check(checklist []int) int {
 				stopFlag = false
 				break
 			}
+
 			//新的子节点位置已经超过原数组大小了
 			if newSonNodeIndex > len(this.Base) {
 				this.extendBaseCheck(newSonNodeIndex - len(this.Base) + 1)
@@ -230,7 +231,7 @@ func (this *DATrie) Insert(word string) {
 
 
 			//选择迁移成本较小的节点
-			if len(preNodeSons)+1 > len(anotherNodeSons) {
+			if len(preNodeSons) + 1 > len(anotherNodeSons) {
 				newBaseValue = this.x_check(anotherNodeSons)
 			} else {
 				newBaseValue = this.x_check(append(preNodeSons, this.GetRuneCode(char)))

@@ -8,7 +8,7 @@ import (
 
 func main() {
 	tree := BaseTrie.NewMapTrie()
-	tree.Insert("word")
+	tree.Insert("word.py")
 	tree.Insert("wor")
 	tree.Insert("wx")
 	tree.Insert("abastract")
@@ -17,7 +17,7 @@ func main() {
 	//tree.Insert("中国")
 	//Trie.PreTraverse(tree.Root)
 	//fmt.Println(tree.CountPrefix("wordf"))
-	//fmt.Println(tree.Has("word"))
+	//fmt.Println(tree.Has("word.py"))
 	//fmt.Println(tree.CountPrefix("wor"))
 	//fmt.Println(tree.CountPrefix("wo"))
 	//fmt.Println(tree.CountPrefix("w"))
