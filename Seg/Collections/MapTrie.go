@@ -12,8 +12,10 @@ type TrieNode struct {
 	Character rune               //存储的值
 }
 
+
 func newTrieNode() *TrieNode {
 	node := &TrieNode{}
+
 	node.Num = 1
 	node.Sons = make(map[rune]*TrieNode)
 	node.IsEnd = false
@@ -142,7 +144,7 @@ func (this *MapTrie) FindPrefix(prefix string) *TrieNode {
 
 }
 
-//分词
+//最大匹配分词
 func (this *MapTrie) Segment(setence string) []string {
 	chars := []rune(setence)
 	results := make([]string, 0)

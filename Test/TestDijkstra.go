@@ -1,7 +1,7 @@
 package main
 
 import (
-	Collections "github.com/zhmc/PowerNLP/Seg/Collections"
+	"github.com/zhmc/PowerNLP/Seg/Collections"
 
 	"fmt"
 )
