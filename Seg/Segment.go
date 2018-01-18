@@ -15,7 +15,7 @@ func NewMapTrieSeg() *Collections.MapTrie {
 }
 
 //默认分词器
-func DeafaultSegment() Tokenizer {
+func DefaultSegment() Tokenizer {
 
 	return NewMapTrieSeg()
 }

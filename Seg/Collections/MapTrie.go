@@ -29,25 +29,25 @@ type MapTrie struct {
 }
 
 func NewMapTrie() *MapTrie {
-	newtrie := &MapTrie{}
-	newtrie.Root = newTrieNode()
-	return newtrie
+	newTrie := &MapTrie{}
+	newTrie.Root = newTrieNode()
+	return newTrie
 }
 
 //加载词典
-func (this *MapTrie) LoadDict(dictpath string) {
+func (m *MapTrie) LoadDict(dictPath string) {
 
 }
 
 //插入一个单词
-func (this *MapTrie) Insert(word string) {
+func (m *MapTrie) Insert(word string) {
 	if len(word) == 0 {
 		return
 	}
-	//if this.Has(word.py) {
+	//if m.Has(word.py) {
 	//	return
 	//}
-	tmpNode := this.Root
+	tmpNode := m.Root
 	letters := []rune(word)
 	for _, letter := range letters {
 
@@ -65,11 +65,11 @@ func (this *MapTrie) Insert(word string) {
 }
 
 //计算包含某个前缀的单词数量
-func (this *MapTrie) CountPrefix(prefix string) int {
+func (m *MapTrie) CountPrefix(prefix string) int {
 	if len(prefix) == 0 {
 		return -1
 	}
-	tmpNode := this.Root
+	tmpNode := m.Root
 	letters := []rune(prefix)
 	for _, letter := range letters {
 
@@ -93,8 +93,8 @@ func PreTraverse(node *TrieNode) {
 	}
 }
 
-func (this *MapTrie) PreTraverseByPrefix(prefix string) {
-	node := this.FindPrefix(prefix)
+func (m *MapTrie) PreTraverseByPrefix(prefix string) {
+	node := m.FindPrefix(prefix)
 	if node == nil {
 		return
 	}
@@ -102,11 +102,11 @@ func (this *MapTrie) PreTraverseByPrefix(prefix string) {
 }
 
 //是否包含某个单词
-func (this *MapTrie) Has(word string) bool {
+func (m *MapTrie) Has(word string) bool {
 	if len(word) == 0 {
 		return false
 	}
-	tmpNode := this.Root
+	tmpNode := m.Root
 	letters := []rune(word)
 	for _, letter := range letters {
 
@@ -124,11 +124,11 @@ func (this *MapTrie) Has(word string) bool {
 }
 
 //找到某个前缀的最终节点
-func (this *MapTrie) FindPrefix(prefix string) *TrieNode {
+func (m *MapTrie) FindPrefix(prefix string) *TrieNode {
 	if len(prefix) == 0 {
 		return nil
 	}
-	tmpNode := this.Root
+	tmpNode := m.Root
 	letters := []rune(prefix)
 	for _, letter := range letters {
 
@@ -145,12 +145,12 @@ func (this *MapTrie) FindPrefix(prefix string) *TrieNode {
 }
 
 //最大匹配分词
-func (this *MapTrie) Segment(setence string) []string {
-	chars := []rune(setence)
+func (m *MapTrie) Segment(sentence string) []string {
+	chars := []rune(sentence)
 	results := make([]string, 0)
 	//tmpChar := ""
-	tmpHead := 0         //扫描全部字符过程中位于单词头部的指针位置
-	tmpNode := this.Root //在词典里顺延的节点指针
+	tmpHead := 0      //扫描全部字符过程中位于单词头部的指针位置
+	tmpNode := m.Root //在词典里顺延的节点指针
 	length := len(chars)
 	for index := 0; index < length; index++ {
 
@@ -182,7 +182,7 @@ func (this *MapTrie) Segment(setence string) []string {
 			//将头指针移到下一个字符
 			tmpHead = index + 1
 			// 将指针节点移到树根
-			tmpNode = this.Root
+			tmpNode = m.Root
 		} else if tmpNode.IsEnd { //词典里面的词结束了
 			word := string(chars[tmpHead:index])
 
@@ -192,7 +192,7 @@ func (this *MapTrie) Segment(setence string) []string {
 			tmpHead = index
 			index-- // index往回退一个，因为这一次的字符和之前的不连，不退就错过了一个字符
 			// 将节点指针移到树根
-			tmpNode = this.Root
+			tmpNode = m.Root
 		} else {
 			//匹配到词典某个词的非词前缀（此前缀本身不是词）。
 			//这一段只是词典里某个词的前缀 割出第一个字，扫描指针重新到刚刚的字后面
@@ -201,7 +201,7 @@ func (this *MapTrie) Segment(setence string) []string {
 
 			tmpHead++           //单词头指针移动一格
 			index = tmpHead - 1 //扫描指针回到前面 这个地方减一是因为这次循环结束会加1
-			tmpNode = this.Root
+			tmpNode = m.Root
 		}
 
 	}

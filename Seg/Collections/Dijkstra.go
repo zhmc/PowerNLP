@@ -16,7 +16,7 @@ func (g *Graph) FindShortestPath(from int, to int) Path {
 	resultPath := Path{}
 
 	//表示每个顶点的最短路径的前一个顶点,初始赋值-1
-	statusArray := make([]int, len(g.Vertexs))
+	statusArray := make([]int, len(g.Vertexes))
 	for i := 0; i < len(statusArray); i++ {
 		statusArray[i] = UndeterminedVertexFlag
 	}
@@ -24,7 +24,7 @@ func (g *Graph) FindShortestPath(from int, to int) Path {
 	//添加第一个顶点 起始点
 	nextVertex := -1
 	nextVertexWeight := -1.0
-	for k, v := range g.Vertexs[from].Edges {
+	for k, v := range g.Vertexes[from].Edges {
 		if nextVertex == -1 {
 			nextVertex = k
 			nextVertexWeight = v
@@ -39,18 +39,18 @@ func (g *Graph) FindShortestPath(from int, to int) Path {
 	statusArray[nextVertex] = from
 
 	for nextVertex != to {
-		candidateVertexs := g.findCandidateVertexs(statusArray, from)
-		//fmt.Println("len(candidateVertexs)",len(candidateVertexs))
-		if len(candidateVertexs) == 0 {
+		candidateVertexes := g.findCandidateVertexes(statusArray, from)
+		//fmt.Println("len(candidateVertexes)",len(candidateVertexes))
+		if len(candidateVertexes) == 0 {
 			break
 		}
-		choosedVertex := chooseCandidateVertex(candidateVertexs)
-		nextVertex = choosedVertex.id
+		chosenVertex := chooseCandidateVertex(candidateVertexes)
+		nextVertex = chosenVertex.id
 		//fmt.Println("nextVertex ",nextVertex)
 		if nextVertex == -1 {
 			break
 		}
-		statusArray[nextVertex] = choosedVertex.prev
+		statusArray[nextVertex] = chosenVertex.prev
 	}
 
 	prev := to
@@ -95,8 +95,8 @@ func chooseCandidateVertex(candidates []CandidateVertex) CandidateVertex {
 }
 
 //根据已经确定节点找出候选节点
-func (g *Graph) findCandidateVertexs(statusArray []int, from int) []CandidateVertex {
-	candidateVertexs := make([]CandidateVertex, 0)
+func (g *Graph) findCandidateVertexes(statusArray []int, from int) []CandidateVertex {
+	candidateVertexes := make([]CandidateVertex, 0)
 
 	for i := 0; i < len(statusArray); i++ {
 
@@ -105,13 +105,13 @@ func (g *Graph) findCandidateVertexs(statusArray []int, from int) []CandidateVer
 			continue
 		}
 
-		//fmt.Println("sharedePathLength",sharedePathLength)
-		sharedePathLength := g.computePathLength(statusArray, i, from)
-		if sharedePathLength == -1 { //如果出现-1，则认为路径断掉了
+		//fmt.Println("sharedPathLength",sharedPathLength)
+		sharedPathLength := g.computePathLength(statusArray, i, from)
+		if sharedPathLength == -1 { //如果出现-1，则认为路径断掉了
 			continue
 		}
 		//从已确定节点指向的节点中选取
-		for v, weight := range g.Vertexs[i].Edges {
+		for v, weight := range g.Vertexes[i].Edges {
 			//排除指向的节点是已确定节点
 			if statusArray[v] != UndeterminedVertexFlag {
 				continue
@@ -122,15 +122,15 @@ func (g *Graph) findCandidateVertexs(statusArray []int, from int) []CandidateVer
 			candidate := CandidateVertex{}
 			candidate.id = v
 			candidate.prev = i
-			candidate.pathLength = sharedePathLength + weight
+			candidate.pathLength = sharedPathLength + weight
 			//fmt.Println("candidate.id",candidate.id)
 			//fmt.Println("candidate.prev",candidate.prev)
 			//fmt.Println("candidate.pathLength",candidate.pathLength)
-			candidateVertexs = append(candidateVertexs, candidate)
+			candidateVertexes = append(candidateVertexes, candidate)
 		}
 	}
 
-	return candidateVertexs
+	return candidateVertexes
 }
 
 //计算已经确定节点的最短路径长度
@@ -140,7 +140,7 @@ func (g *Graph) computePathLength(statusArray []int, vertex int, from int) float
 		//fmt.Println("warning")
 		return 0
 	}
-	pathlength := g.Vertexs[prev].Edges[vertex]
+	pathLength := g.Vertexes[prev].Edges[vertex]
 	for prev != from {
 
 		//如果出现-1，则认为路径断掉了
@@ -148,11 +148,11 @@ func (g *Graph) computePathLength(statusArray []int, vertex int, from int) float
 			return -1
 		}
 
-		pathlength += g.Vertexs[statusArray[prev]].Edges[prev]
+		pathLength += g.Vertexes[statusArray[prev]].Edges[prev]
 		prev = statusArray[prev]
 	}
 
-	return pathlength
+	return pathLength
 }
 
 func reverse(s Path) {

@@ -29,7 +29,7 @@ func newMapTrieNode() *MapTrieNode {
 }
 
 //加载字典文件
-func (d *Dict) loadDictinaryFile(filepath string) {
+func (d *Dict) loadDictionaryFile(filePath string) {
 
 }
 

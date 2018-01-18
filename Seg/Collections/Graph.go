@@ -9,22 +9,22 @@ type Vertex struct {
 }
 
 type Graph struct {
-	Vertexs []Vertex
+	Vertexes []Vertex
 }
 
 type Path []int
 
-func NewGraph(vertexnum int) *Graph {
+func NewGraph(vertexNum int) *Graph {
 
 	graph := &Graph{}
-	graph.Vertexs = make([]Vertex, vertexnum)
-	for i := 0; i < vertexnum; i++ {
-		graph.Vertexs[i].Id = i
-		graph.Vertexs[i].Edges = make(map[int]float64)
+	graph.Vertexes = make([]Vertex, vertexNum)
+	for i := 0; i < vertexNum; i++ {
+		graph.Vertexes[i].Id = i
+		graph.Vertexes[i].Edges = make(map[int]float64)
 	}
 	return graph
 }
 
-func (this *Graph) Connect(from int, to int, weight float64) {
-	this.Vertexs[from].Edges[to] = weight
+func (g *Graph) Connect(from int, to int, weight float64) {
+	g.Vertexes[from].Edges[to] = weight
 }
