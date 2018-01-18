@@ -104,18 +104,20 @@ func (g *Graph) findCandidateVertexs(statusArray []int, from int) []CandidateVer
 		if statusArray[i] == UndeterminedVertexFlag {
 			continue
 		}
+
+		//fmt.Println("sharedePathLength",sharedePathLength)
+		sharedePathLength := g.computePathLength(statusArray, i, from)
+		if sharedePathLength == -1 { //如果出现-1，则认为路径断掉了
+			continue
+		}
 		//从已确定节点指向的节点中选取
 		for v, weight := range g.Vertexs[i].Edges {
 			//排除指向的节点是已确定节点
 			if statusArray[v] != UndeterminedVertexFlag {
 				continue
 			}
-			sharedePathLength := g.computePathLength(statusArray, i, from)
-			//fmt.Println("sharedePathLength",sharedePathLength)
 
-			if sharedePathLength == -1 {
-				continue
-			}
+
 			//添加到候选列表
 			candidate := CandidateVertex{}
 			candidate.id = v
@@ -141,7 +143,7 @@ func (g *Graph) computePathLength(statusArray []int, vertex int, from int) float
 	pathlength := g.Vertexs[prev].Edges[vertex]
 	for prev != from {
 
-		//如果出现-1，则认为路径断掉了。
+		//如果出现-1，则认为路径断掉了
 		if prev == UndeterminedVertexFlag {
 			return -1
 		}
