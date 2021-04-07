@@ -13,7 +13,7 @@ func NewPlaceRecognition() (rcvr *PlaceRecognition) {
 func Recognition(pWordSegResult *List, wordNetOptimum *WordNet, wordNetAll *WordNet) (bool) {
 	roleTagList := PlaceRecognition.RoleTag(pWordSegResult, wordNetAll)
 	if NLP.Config.DEBUG {
-		sbLog := NewStringBuilder()
+		sbLog := ""
 		iterator := pWordSegResult.iterator()
 		for _, NSEnumItem := range roleTagList {
 			sbLog.append('[')
@@ -26,7 +26,7 @@ func Recognition(pWordSegResult *List, wordNetOptimum *WordNet, wordNetAll *Word
 	}
 	NSList := PlaceRecognition.ViterbiExCompute(roleTagList)
 	if NLP.Config.DEBUG {
-		sbLog := NewStringBuilder()
+		sbLog := ""
 		iterator := pWordSegResult.iterator()
 		sbLog.append('[')
 		for _, NS := range NSList {
@@ -50,7 +50,7 @@ func insert(listIterator *ListIterator, tagList *List, wordNetAll *WordNet, line
 	tagList = append(tagList, NewEnumItem(ns, 1000))
 }
 func RoleTag(vertexList *List, wordNetAll *WordNet) (*List) {
-	tagList := NewLinkedList()
+	var tagList []string
 	listIterator := vertexList.listIterator()
 	for listIterator.hasNext() {
 		vertex := listIterator.next()

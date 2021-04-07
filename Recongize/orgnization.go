@@ -20,7 +20,7 @@ func NewOrganizationRecognition() (rcvr *OrganizationRecognition) {
 func Recognition(pWordSegResult *List, wordNetOptimum *WordNet, wordNetAll *WordNet) (bool) {
 	roleTagList := OrganizationRecognition.RoleTag(pWordSegResult, wordNetAll)
 	if NLP.Config.DEBUG {
-		sbLog := NewStringBuilder()
+		sbLog := ""
 		iterator := pWordSegResult.iterator()
 		for _, NTEnumItem := range roleTagList {
 			sbLog.append('[')
@@ -33,7 +33,7 @@ func Recognition(pWordSegResult *List, wordNetOptimum *WordNet, wordNetAll *Word
 	}
 	NTList := OrganizationRecognition.ViterbiExCompute(roleTagList)
 	if NLP.Config.DEBUG {
-		sbLog := NewStringBuilder()
+		sbLog := ""
 		iterator := pWordSegResult.iterator()
 		sbLog.append('[')
 		for _, NT := range NTList {
@@ -54,7 +54,7 @@ func Recognition(pWordSegResult *List, wordNetOptimum *WordNet, wordNetAll *Word
 func Recognition2(pWordSegResult *List, wordNetOptimum *WordNet, wordNetAll *WordNet) (bool) {
 	roleTagList := OrganizationRecognition.RoleTag(pWordSegResult, wordNetAll)
 	if NLP.Config.DEBUG {
-		sbLog := NewStringBuilder()
+		sbLog := ""
 		iterator := pWordSegResult.iterator()
 		for _, NTEnumItem := range roleTagList {
 			sbLog.append('[')
@@ -67,7 +67,7 @@ func Recognition2(pWordSegResult *List, wordNetOptimum *WordNet, wordNetAll *Wor
 	}
 	NTList := OrganizationRecognition.ViterbiExCompute(roleTagList)
 	if NLP.Config.DEBUG {
-		sbLog := NewStringBuilder()
+		sbLog := ""
 		iterator := pWordSegResult.iterator()
 		sbLog.append('[')
 		for _, NT := range NTList {
@@ -86,7 +86,7 @@ func Recognition2(pWordSegResult *List, wordNetOptimum *WordNet, wordNetAll *Wor
 	return true
 }
 func RoleTag(vertexList *List, wordNetAll *WordNet) (*List) {
-	tagList := NewLinkedList()
+	var tagList []string
 	for _, vertex := range vertexList {
 		nature := vertex.guessNature()
 		switch nature {

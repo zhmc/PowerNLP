@@ -21,7 +21,7 @@ func NewPersonRecognition() (rcvr *PersonRecognition) {
 func Recognition(pWordSegResult *List, wordNetOptimum *WordNet, wordNetAll *WordNet) (bool) {
 	roleTagList := PersonRecognition.RoleObserve(pWordSegResult)
 	if NLP.Config.DEBUG {
-		sbLog := NewStringBuilder()
+		sbLog := ""
 		iterator := pWordSegResult.iterator()
 		for _, nrEnumItem := range roleTagList {
 			sbLog.append('[')
@@ -34,7 +34,7 @@ func Recognition(pWordSegResult *List, wordNetOptimum *WordNet, wordNetAll *Word
 	}
 	nrList := PersonRecognition.ViterbiComputeSimply(roleTagList)
 	if NLP.Config.DEBUG {
-		sbLog := NewStringBuilder()
+		sbLog := ""
 		iterator := pWordSegResult.iterator()
 		sbLog.append('[')
 		for _, nr := range nrList {
@@ -53,8 +53,7 @@ func Recognition(pWordSegResult *List, wordNetOptimum *WordNet, wordNetAll *Word
 	return true
 }
 func Recognition2(segResult *List, wordNetOptimum *WordNet, wordNetAll *WordNet) {
-	sbName := NewStringBuilder()
-	appendTimes := 0
+	sbName := ""
 	listIterator := segResult.listIterator()
 	listIterator.next()
 	line := 1
@@ -86,7 +85,7 @@ func Recognition2(segResult *List, wordNetOptimum *WordNet, wordNetAll *WordNet)
 	}
 }
 func RoleObserve(wordSegResult *List) (*List) {
-	tagList := NewLinkedList()
+	var tagList []string
 	iterator := wordSegResult.iterator()
 	iterator.next()
 	tagList = append(tagList, NewEnumItem(NR.A, NR.K))

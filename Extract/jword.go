@@ -19,14 +19,14 @@ func NewTextRankKeyword() (rcvr *TextRankKeyword) {
 }
 func (rcvr *TextRankKeyword) GetKeyword(title string, content string) (string) {
 	termList := NLP.segment(fmt.Sprintf("%v%v", title, content))
-	wordList := NewArrayList()
+	var wordList []word
 	for _, t := range termList {
 		if rcvr.ShouldInclude(t) {
 			wordList = append(wordList, t.word)
 		}
 	}
-	words := NewHashMap()
-	que := NewLinkedList()
+	words := make([float32]word)
+	var que []float32
 	for _, w := range wordList {
 		if !words.containsKey(w) {
 			words.put(w, NewHashSet())
@@ -45,9 +45,9 @@ func (rcvr *TextRankKeyword) GetKeyword(title string, content string) (string) {
 			}
 		}
 	}
-	score := NewHashMap()
+	score :=make([float32]word)
 	for i := 0; i < max_iter; i++ {
-		m := NewHashMap()
+		m := make([float32]word)
 		max_diff := 0
 		for _, entry := range words.entrySet() {
 			key := entry.getKey()
@@ -67,7 +67,7 @@ func (rcvr *TextRankKeyword) GetKeyword(title string, content string) (string) {
 			break
 		}
 	}
-	entryList := NewArrayList(score.entrySet())
+	entryList := make(score.entrySet())
 	Collections.sort(entryList, NewAnonymous_Comparator_0())
 	result := ""
 	for i := 0; i < NKeyword; i++ {

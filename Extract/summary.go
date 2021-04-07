@@ -65,10 +65,10 @@ func (rcvr *TextRankSummary) GetTopSentence2(size int) (<<array>>) {
 }
 func GetTopSentenceList(document string, size int) (*List) {
 	sentenceList := TextRankSummary.spiltSentence(document)
-	docs := NewArrayList()
+	var docs []doc
 	for _, sentence := range sentenceList {
 		termList := NLP.segment(sentence)
-		wordList := NewLinkedList()
+		var wordList []doc
 		for _, term := range termList {
 			if TextRankSummary.ShouldInclude(term) {
 				wordList = append(wordList, term.word)
@@ -78,7 +78,7 @@ func GetTopSentenceList(document string, size int) (*List) {
 	}
 	textRankSummary := NewTextRankSummary(docs)
 	topSentence := textRankSummary.getTopSentence(size)
-	resultList := NewLinkedList()
+	var resultList []doc
 	for _, i := range topSentence {
 		resultList = append(resultList, sentenceList[i])
 	}
@@ -126,7 +126,7 @@ func (rcvr *TextRankSummary) solve() {
 	}
 }
 func spiltSentence(document string) (*List) {
-	sentences := NewArrayList()
+	var sentences []string
 	if document == nil {
 		return sentences
 	}
@@ -146,7 +146,7 @@ func spiltSentence(document string) (*List) {
 	return sentences
 }
 func spiltSentence2(document string) (*List) {
-	sentences := NewArrayList()
+	var sentences []string
 	if document == nil {
 		return sentences
 	}
