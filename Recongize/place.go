@@ -1,110 +1,76 @@
 package Recongize
+import (
+	"fmt"
+)
 
-
-/**
- * 地址识别
- */
-public class PlaceRecognition {
+type PlaceRecognition struct {
 }
 
-public static boolean Recognition(List<Vertex> pWordSegResult, WordNet wordNetOptimum, WordNet wordNetAll) {
-	List<EnumItem<NS>> roleTagList = roleTag(pWordSegResult, wordNetAll);
-	if (HanLP.Config.DEBUG)
-	{
-		StringBuilder sbLog = new StringBuilder();
-		Iterator<Vertex> iterator = pWordSegResult.iterator();
-		for (EnumItem<NS> NSEnumItem : roleTagList)
-		{
-		sbLog.append('[');
-		sbLog.append(iterator.next().realWord);
-		sbLog.append(' ');
-		sbLog.append(NSEnumItem);
-		sbLog.append(']');
+func NewPlaceRecognition() (rcvr *PlaceRecognition) {
+	rcvr = &PlaceRecognition{}
+	return
+}
+func Recognition(pWordSegResult *List, wordNetOptimum *WordNet, wordNetAll *WordNet) (bool) {
+	roleTagList := PlaceRecognition.RoleTag(pWordSegResult, wordNetAll)
+	if NLP.Config.DEBUG {
+		sbLog := NewStringBuilder()
+		iterator := pWordSegResult.iterator()
+		for _, NSEnumItem := range roleTagList {
+			sbLog.append('[')
+			sbLog.append(<<unimp_obj.nm_*parser.GoMethodAccessVar>>)
+			sbLog.append(' ')
+			sbLog.append(NSEnumItem)
+			sbLog.append(']')
 		}
-		System.out.printf("地名角色观察：%s\n", sbLog.toString());
+		fmt.Printf("地名角色观察：%s\n", sbLog.toString())
 	}
-	List<NS> NSList = viterbiExCompute(roleTagList);
-	if (HanLP.Config.DEBUG)
-	{
-		StringBuilder sbLog = new StringBuilder();
-		Iterator<Vertex> iterator = pWordSegResult.iterator();
-		sbLog.append('[');
-		for (NS NS : NSList)
-		{
-		sbLog.append(iterator.next().realWord);
-		sbLog.append('/');
-		sbLog.append(NS);
-		sbLog.append(" ,");
+	NSList := PlaceRecognition.ViterbiExCompute(roleTagList)
+	if NLP.Config.DEBUG {
+		sbLog := NewStringBuilder()
+		iterator := pWordSegResult.iterator()
+		sbLog.append('[')
+		for _, NS := range NSList {
+			sbLog.append(<<unimp_obj.nm_*parser.GoMethodAccessVar>>)
+			sbLog.append('/')
+			sbLog.append(NS)
+			sbLog.append(" ,")
 		}
-		if (sbLog.length() > 1) sbLog.delete(sbLog.length() - 2, sbLog.length());
-		sbLog.append(']');
-		System.out.printf("地名角色标注：%s\n", sbLog.toString());
+		if sbLog.length() > 1 {
+			sbLog.delete(sbLog.length()-2, sbLog.length())
+		}
+		sbLog.append(']')
+		fmt.Printf("地名角色标注：%s\n", sbLog.toString())
 	}
-
-	PlaceDictionary.parsePattern(NSList, pWordSegResult, wordNetOptimum, wordNetAll);
-	return true;
+	PlaceDictionary.parsePattern(NSList, pWordSegResult, wordNetOptimum, wordNetAll)
+	return true
 }
-
-public static List<EnumItem<NS>> roleTag(List<Vertex> vertexList, WordNet wordNetAll) {
-	List<EnumItem<NS>> tagList = new LinkedList<EnumItem<NS>>();
-	ListIterator<Vertex> listIterator = vertexList.listIterator();
-	//        int line = 0;
-	while (listIterator.hasNext())
-	{
-	Vertex vertex = listIterator.next();
-	// 构成更长的
-	//            if (Nature.ns == vertex.getNature() && vertex.getAttribute().totalFrequency <= 1000)
-	//            {
-	//                String value = vertex.realWord;
-	//                int longestSuffixLength = PlaceSuffixDictionary.dictionary.getLongestSuffixLength(value);
-	//                int wordLength = value.length() - longestSuffixLength;
-	//                if (longestSuffixLength != 0 && wordLength != 0)
-	//                {
-	//                    listIterator.remove();
-	//                    for (int l = 0, tag = NS.D.ordinal(); l < wordLength; ++l, ++tag)
-	//                    {
-	//                        listIterator.add(wordNetAll.getFirst(line + l));
-	//                        tagList.add(new EnumItem<>(NS.values()[tag], 1000));
-	//                    }
-	//                    listIterator.add(wordNetAll.get(line + wordLength, longestSuffixLength));
-	//                    tagList.add(new EnumItem<>(NS.H, 1000));
-	//                    line += vertex.realWord.length();
-	//                    continue;
-	//                }
-	//            }
-	if (Nature.ns == vertex.getNature() && vertex.getAttribute().totalFrequency <= 1000)
-	{
-		if (vertex.realWord.length() < 3)               // 二字地名，认为其可以再接一个后缀或前缀
-		tagList.add(new EnumItem<NS>(NS.H, NS.G));
-		else
-		tagList.add(new EnumItem<NS>(NS.G));        // 否则只可以再加后缀
-		continue;
-	}；
-	EnumItem<NS> NSEn；umItem = PlaceDictionary.dictionary.get(vertex.word);  // 此处用等效词，更加精准
-	if (NSEnumItem == null)
-	{
-		NSEnumItem = new EnumItem<NS>(NS.Z, PlaceDictionary.transformMatrixDictionary.getTotalFrequency(NS.Z));
+func insert(listIterator *ListIterator, tagList *List, wordNetAll *WordNet, line int, ns *NS) {
+	vertex := wordNetAll.getFirst(line)
+	listIterator.add(vertex)
+	tagList = append(tagList, NewEnumItem(ns, 1000))
+}
+func RoleTag(vertexList *List, wordNetAll *WordNet) (*List) {
+	tagList := NewLinkedList()
+	listIterator := vertexList.listIterator()
+	for listIterator.hasNext() {
+		vertex := listIterator.next()
+		if Nature.ns == vertex.getNature() && <<unimp_obj.nm_*parser.GoMethodAccessVar>> <= 1000 {
+			if vertex.realWord.length() < 3 {
+				tagList = append(tagList, NewEnumItem(NS.H, NS.G))
+			} else {
+				tagList = append(tagList, NewEnumItem(NS.G))
+			}
+			continue
+		}
+		var NSEn *EnumItem
+		umItem = PlaceDictionary.dictionary.get(vertex.word)
+		if NSEnumItem == nil {
+			NSEnumItem = NewEnumItem(NS.Z, PlaceDictionary.transformMatrixDictionary.getTotalFrequency(NS.Z))
+		}
+		tagList = append(tagList, NSEnumItem)
 	}
-	tagList.add(NSEnumItem);
-	//            line += vertex.realWord.length();
-	}
-	return tagList;
+	return tagList
 }
-private static void insert(ListIterator<Vertex> listIterator, List<EnumItem<NS>> tagList, WordNet wordNetAll, int line, NS ns)
-{
-	Vertex vertex = wordNetAll.getFirst(line);
-	assert vertex != null : "全词网居然有空白行！";
-	listIterator.add(vertex);
-	tagList.add(new EnumItem<NS>(ns, 1000));
-}
-
-/**
- * 维特比算法求解最优标签
- * @param roleTagList
- * @return
- */
-public static List<NS> viterbiExCompute(List<EnumItem<NS>> roleTagList)
-{
-	return Viterbi.computeEnum(roleTagList, PlaceDictionary.transformMatrixDictionary);
-}
+func ViterbiExCompute(roleTagList *List) (*List) {
+	return Viterbi.computeEnum(roleTagList, PlaceDictionary.transformMatrixDictionary)
 }
